@@ -14,14 +14,14 @@ int main()
     // Objetos do programa principal
     Mat src;
     Capturador imagem(N_COLUNAS, N_LINHAS);
-    Reconhecedor reconhecimento(N_COLUNAS, N_LINHAS, 8, 30, 50, 1);
+    Reconhecedor reconhecimento(N_COLUNAS, N_LINHAS, 5, 30, 50, 1);
     Controlador controle(N_COLUNAS, N_LINHAS, kp, 51200, 0, v_min, v_max);
     Pwm pwms;
     Leds leds;
     Buttons buttons;
     Trimpot trimpot0(0, 0, 51200);
     Trimpot trimpot1(1, 1500000, 1800000);
-    Trimpot trimpot2(2, 1500000, 1800000);
+    Trimpot trimpot2(2, 1500000, 2000000);
 
 
 	#ifdef TRATAMENTO_RAMPA
@@ -163,15 +163,15 @@ int main()
         {
         	v_min = trimpot2.getValue();
         	controle.setVelocMin(v_min);
-        	usleep(10000);
+        	usleep(50000);
 
         	v_max = trimpot1.getValue();
         	controle.setVelocMax(v_max);
-        	usleep(10000);
+        	usleep(50000);
 
         	kp = trimpot0.getValue();
         	controle.setKp(kp);
-        	usleep(10000);
+        	usleep(50000);
         }
 
 
