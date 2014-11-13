@@ -32,10 +32,10 @@ using namespace cv;
 	// Estruturas auxiliares para o tratamento da rampa
 	#define SUBIDA 1
 	#define DESCIDA 2
-	#define TEMPO_RAMPA 13		// valor * 100 ms: tempo do turbo ou freio
+	#define TEMPO_RAMPA 10		// valor * 100 ms: tempo do turbo ou freio
 	#define INTERVALO_RAMPA 10	// valor * 100 ms: intervalo entre leituras dos eventos de rampa
-	#define GY_SUBIDA -7000		// limiar do valor lido pelo giroscópio para identificar uma subida
-	#define GY_DESCIDA 7000		// limiar do valor lido pelo giroscópio para identificar uma descida
+	#define GY_SUBIDA -10000		// limiar do valor lido pelo giroscópio para identificar uma subida
+	#define GY_DESCIDA 10000		// limiar do valor lido pelo giroscópio para identificar uma descida
 
 	void* tickTimerThread(void *ticks_ptr);
 

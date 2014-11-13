@@ -5,7 +5,7 @@ int main()
 {
 	// Variáveis do programa principal
     int erro[2] = {0, 0}, n_linhas_ok = 0, servo = 0, esc = 0, x = 0, y = 0;
-    int v_min = 1500000, v_max = 1800000, kp = 40000;
+    int v_min = 1500000, v_max = 1800000, kp = 40000, kd = 0;
 
 
     // Seleciona a frequência da BBB para 1GHz
@@ -14,14 +14,14 @@ int main()
     // Objetos do programa principal
     Mat src;
     Capturador imagem(N_COLUNAS, N_LINHAS);
-    Reconhecedor reconhecimento(N_COLUNAS, N_LINHAS, 5, 30, 50, 1);
-    Controlador controle(N_COLUNAS, N_LINHAS, kp, 51200, 0, v_min, v_max);
+    Reconhecedor reconhecimento(N_COLUNAS, N_LINHAS, 8, 40, 50, 1);
+    Controlador controle(N_COLUNAS, N_LINHAS, kp, 51200, kd, v_min, v_max);
     Pwm pwms;
     Leds leds;
     Buttons buttons;
-    Trimpot trimpot0(0, 0, 51200);
-    Trimpot trimpot1(1, 1500000, 1800000);
-    Trimpot trimpot2(2, 1500000, 2000000);
+    Trimpot trimpot0(0, 1500000, 1800000);	// Velocidade
+    Trimpot trimpot1(1, 0, 10240);	// Kd
+    Trimpot trimpot2(2, 0, 51200);	// Kp
 
 
 	#ifdef TRATAMENTO_RAMPA
@@ -49,14 +49,16 @@ int main()
 	#endif
     pwms.initServo();
     pwms.initESC();
-    v_min = trimpot2.getValue();
+    kp = trimpot2.getValue();
+    controle.setKp(kp);
+	usleep(50000);
+	kd = trimpot1.getValue();
+	controle.setKd(kd);
+	usleep(50000);
+	v_min = v_max = trimpot0.getValue();
 	controle.setVelocMin(v_min);
-	usleep(50000);
-	v_max = trimpot1.getValue();
 	controle.setVelocMax(v_max);
-	usleep(50000);
-	kp = trimpot0.getValue();
-	controle.setKp(kp);
+
 	usleep(2000000);
     leds.setColor(GREEN);
     imagem.open();
@@ -100,7 +102,7 @@ int main()
 		esc = controle.velocidade(n_linhas_ok); // Executa o controlador de velocidade
 
 
-		#ifdef TRAMENTO_RAMPA
+		#ifdef TRATAMENTO_RAMPA
 			// Tratamento da rampa -------------------------------------------------------------------------------------
 			if (rampa == SUBIDA)
 			{
@@ -135,7 +137,7 @@ int main()
         	// Reinicialização das variáveis
         	x = SP_X; y = 0; erro[0] = 0; erro[1] = 0;
         	reconhecimento.centro_frame_ant = SP_X;
-			#ifdef TRAMENTO_RAMPA
+			#ifdef TRATAMENTO_RAMPA
         		ticks_rampa = -INTERVALO_RAMPA, rampa = 0;
 			#endif
 
@@ -149,7 +151,7 @@ int main()
 			usleep(2000000);
 			leds.setColor(GREEN);
 			imagem.open();
-			#ifdef TRAMENTO_RAMPA
+			#ifdef TRATAMENTO_RAMPA
 				ticks = 0;
 			#endif
 			#ifdef DEBUG
@@ -161,17 +163,18 @@ int main()
 		// Atualização das variáveis controladas pelos trimpots --------------------------------------------------------
         if(buttons.getStatus() == LEFT)
         {
-        	v_min = trimpot2.getValue();
-        	controle.setVelocMin(v_min);
-        	usleep(50000);
+        	kp = trimpot2.getValue();
+			controle.setKp(kp);
+			usleep(100000);
 
-        	v_max = trimpot1.getValue();
-        	controle.setVelocMax(v_max);
-        	usleep(50000);
+			kd = trimpot1.getValue();
+			controle.setKd(kd);
+			usleep(100000);
 
-        	kp = trimpot0.getValue();
-        	controle.setKp(kp);
-        	usleep(50000);
+			v_min = v_max = trimpot0.getValue();
+			controle.setVelocMin(v_min);
+			controle.setVelocMax(v_max);
+			usleep(100000);
         }
 
 
@@ -193,6 +196,7 @@ int main()
 				printf("Servo: %d\n", servo);
 				printf("ESC (%d - %d): %d\n", v_min, v_max, esc);
 				printf("Kp: %d\n", kp);
+				printf("Kd: %d\n", kd);
 
 				#ifdef TRATAMENTO_RAMPA
 					printf("Ticks: %d\n", ticks);
@@ -207,7 +211,7 @@ int main()
 }
 
 
-#ifdef TRAMENTO_RAMPA
+#ifdef TRATAMENTO_RAMPA
 	// Thread auxiliar: 100 ms -> 10 Hz ********************************************************************************
 	void* tickTimerThread(void *ticks_void_ptr)
 	{
