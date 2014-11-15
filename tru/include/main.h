@@ -21,21 +21,29 @@
 using namespace std;
 using namespace cv;
 
-//#define DEBUG				// Retire o comentário para visualizar as mensagens de Debug
-//#define TRATAMENTO_RAMPA	// Retire o comentário para habilitar o tratamento da rampa (turbo e freio)
+#define DEBUG				// Retire o comentário para visualizar as mensagens de Debug
+#define TRATAMENTO_RAMPA	// Retire o comentário para habilitar o tratamento da rampa (turbo e freio)
 
 #define N_COLUNAS   320     // Largura da imagem
 #define N_LINHAS    176     // Altura da imagem
-#define SP_X (N_COLUNAS / 2)    // Setpoint da direção em relação à imagem (centro da foto)
+#define SP_X (N_COLUNAS / 2)    // Set-point da direção em relação à imagem (centro da foto)
 
 #ifdef TRATAMENTO_RAMPA
 	// Estruturas auxiliares para o tratamento da rampa
 	#define SUBIDA 1
 	#define DESCIDA 2
+	#define PATAMAR 3
+	#define	PASSOU 4
 	#define TEMPO_RAMPA 10		// valor * 100 ms: tempo do turbo ou freio
 	#define INTERVALO_RAMPA 10	// valor * 100 ms: intervalo entre leituras dos eventos de rampa
-	#define GY_SUBIDA -10000		// limiar do valor lido pelo giroscópio para identificar uma subida
-	#define GY_DESCIDA 10000		// limiar do valor lido pelo giroscópio para identificar uma descida
+	#define GY_SUBIDA -10000	// limiar do valor lido pelo giroscópio para identificar uma subida
+	#define GY_DESCIDA 10000	// limiar do valor lido pelo giroscópio para identificar uma descida
+	#define TURBO 80000			// Incremento de velocidade para execução da rampa
+
+	#define T_HABILITA_RAMPA 130	// valor * 100 ms: tempo para habilitar rampa após a partida
+	#define T_TURBO 7	// valor * 100 ms: tempo com velocidade turbo
+	#define T_NORMAL 7	// valor * 100 ms: tempo com velocidade normal durante o patamar
+	#define T_FREIO 5	// valor * 100 ms: tempo de atuação do freio
 
 	void* tickTimerThread(void *ticks_ptr);
 

@@ -19,7 +19,7 @@ int main()
     Pwm pwms;
     Leds leds;
     Buttons buttons;
-    Trimpot trimpot0(0, 1500000, 1800000);	// Velocidade
+    Trimpot trimpot0(0, 1600000, 1750000);	// Velocidade
     Trimpot trimpot1(1, 0, 10240);	// Kd
     Trimpot trimpot2(2, 0, 51200);	// Kp
 
@@ -28,7 +28,7 @@ int main()
 		// Declaração das variáveis necessárias para o tratamento da rampa e criação da thread auxiliar
 		unsigned int ticks = 0;
 		int tempo_rampa = 0;
-		ticks_rampa = -INTERVALO_RAMPA;
+		//ticks_rampa = -INTERVALO_RAMPA;
 		pthread_t tick_timer;
 		pthread_create(&tick_timer, NULL, tickTimerThread, &ticks);
 	#endif
@@ -42,6 +42,8 @@ int main()
 		printf("Aguardando apertar o botao ESQUERDO para iniciar o robo...\n");
 	#endif
 
+	//pwms.initServo();
+	//pwms.initESC();
     leds.setColor(RED);
     while(buttons.getStatus() != LEFT) usleep(250000);
 	#ifdef DEBUG
@@ -106,19 +108,11 @@ int main()
 			// Tratamento da rampa -------------------------------------------------------------------------------------
 			if (rampa == SUBIDA)
 			{
-				esc += 100000;		// Habilita o turbo para a subida
+				esc += TURBO;		// Habilita o turbo para a subida
 			}
-			else if (rampa == DESCIDA)
+			if (rampa == DESCIDA)
 			{
 				esc = ESC_NEUTRO;	// Habilita o freio para a descida
-			}
-			if (rampa > 0)
-			{
-				if (++tempo_rampa >= TEMPO_RAMPA)
-				{
-					rampa = 0;
-					tempo_rampa = 0;
-				}
 			}
 		#endif
 
@@ -138,7 +132,9 @@ int main()
         	x = SP_X; y = 0; erro[0] = 0; erro[1] = 0;
         	reconhecimento.centro_frame_ant = SP_X;
 			#ifdef TRATAMENTO_RAMPA
-        		ticks_rampa = -INTERVALO_RAMPA, rampa = 0;
+        		//ticks_rampa = -INTERVALO_RAMPA;
+        		rampa = 0;
+        		ticks = 0;
 			#endif
 
         	// Rotina de inicialização
@@ -200,6 +196,7 @@ int main()
 
 				#ifdef TRATAMENTO_RAMPA
 					printf("Ticks: %d\n", ticks);
+					printf("Rampa: %d\n", rampa);
 				#endif
 			}
 		#endif
@@ -229,18 +226,33 @@ int main()
 			gy = accelgyro.getRotationY();
 
 			// Verifica os eventos de subida ou descida, não permite eventos sucessivos em um intervalo de tempo
-			if(gy < GY_SUBIDA && ((*ticks_ptr - ticks_rampa) >= INTERVALO_RAMPA))	// Identificação da subida
+			if((gy < GY_SUBIDA) && ((*ticks_ptr) >= T_HABILITA_RAMPA) && (rampa == 0))	// Identificação da subida
 			{
 				ticks_rampa = *ticks_ptr;
 				rampa = SUBIDA;
 			}
-			else if(gy > GY_DESCIDA && ((*ticks_ptr - ticks_rampa) >= INTERVALO_RAMPA))	// Identificação da descida
+			if((rampa == SUBIDA) && ((*ticks_ptr - ticks_rampa) >= T_TURBO))
+			{
+				ticks_rampa = *ticks_ptr;
+				rampa = PATAMAR;
+			}
+			if((rampa == PATAMAR) && ((*ticks_ptr - ticks_rampa) >= T_NORMAL))
 			{
 				ticks_rampa = *ticks_ptr;
 				rampa = DESCIDA;
 			}
+			if((rampa == DESCIDA) && ((*ticks_ptr - ticks_rampa) >= T_FREIO))
+			{
+				ticks_rampa = *ticks_ptr;
+				rampa = PASSOU;
+			}
+			/*else if(gy > GY_DESCIDA && ((*ticks_ptr - ticks_rampa) >= INTERVALO_RAMPA))	// Identificação da descida
+			{
+				ticks_rampa = *ticks_ptr;
+				rampa = DESCIDA;
+			}*/
 
-			usleep(100000);
+			usleep(100000);	// 100 ms
 		}
 
 		return NULL;
