@@ -6,6 +6,7 @@ int main()
 	// Variáveis do programa principal
     int erro[2] = {0, 0}, n_linhas_ok = 0, servo = 0, esc = 0, x = 0, y = 0;
     int v_min = 1500000, v_max = 1800000, kp = 40000, kd = 0;
+    bool fim = false;
 
 
     // Seleciona a frequência da BBB para 1GHz
@@ -116,14 +117,26 @@ int main()
 			}
 		#endif
 
+		// Turbo na largada
+		if(ticks <= T_LARGADA)
+		{
+			esc += TURBO;
+		}
+
 		// Acionamento dos motores -------------------------------------------------------------------------------------
 		pwms.updateServo(servo);  // Atualiza a posição do servo de acordo com o controle
 		pwms.updateESC(esc);      // Atualiza a velocidade do motor de acordo com o controle
 
 
+		if(ticks >= T_FIM)
+		{
+			fim = true;
+		}
+
 		// Partida ou Parada do Robô -----------------------------------------------------------------------------------
-        if(buttons.getStatus() == RIGHT)
+        if(buttons.getStatus() == RIGHT || fim == true)
         {
+        	fim = false;
         	// Parada do robô
         	pwms.updateESC(ESC_NEUTRO);
         	imagem.close();
@@ -246,11 +259,7 @@ int main()
 				ticks_rampa = *ticks_ptr;
 				rampa = PASSOU;
 			}
-			/*else if(gy > GY_DESCIDA && ((*ticks_ptr - ticks_rampa) >= INTERVALO_RAMPA))	// Identificação da descida
-			{
-				ticks_rampa = *ticks_ptr;
-				rampa = DESCIDA;
-			}*/
+
 
 			usleep(100000);	// 100 ms
 		}
