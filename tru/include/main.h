@@ -35,14 +35,15 @@ using namespace cv;
 	#define PATAMAR 3
 	#define	PASSOU 4
 	#define GY_SUBIDA -10000	// limiar do valor lido pelo giroscópio para identificar uma subida
-	#define TURBO 80000			// Incremento de velocidade para execução da rampa
+	#define TURBO 90000			// Incremento de velocidade para execução da rampa
 
 	#define T_LARGADA 6	// valor * 100 ms: tempo de turbo na largada
 	#define T_HABILITA_RAMPA 100	// valor * 100 ms: tempo para habilitar rampa após a partida
-	#define T_TURBO 7	// valor * 100 ms: tempo com velocidade turbo
-	#define T_NORMAL 0	// valor * 100 ms: tempo com velocidade normal durante o patamar
-	#define T_FREIO 5	// valor * 100 ms: tempo de atuação do freio
-	#define T_FIM 230
+	#define T_TURBO 6	// valor * 100 ms: tempo com velocidade turbo
+	#define T_NORMAL 2	// valor * 100 ms: tempo com velocidade normal durante o patamar
+	#define T_FREIO 6	// valor * 100 ms: tempo de atuação do freio
+	#define T_FIM 230	// valor * 100 ms: tempo para parar o robô no fim da volta
+	#define T_PARADA 205
 
 	void* tickTimerThread(void *ticks_ptr);
 

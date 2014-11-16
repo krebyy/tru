@@ -123,6 +123,11 @@ int main()
 			esc += TURBO;
 		}
 
+		if(ticks >= T_PARADA)
+		{
+			esc += 20000;
+		}
+
 		// Acionamento dos motores -------------------------------------------------------------------------------------
 		pwms.updateServo(servo);  // Atualiza a posição do servo de acordo com o controle
 		pwms.updateESC(esc);      // Atualiza a velocidade do motor de acordo com o controle

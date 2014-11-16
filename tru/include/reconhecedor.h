@@ -8,14 +8,14 @@ using namespace cv;
 #define FITA 255        // Cor da fita: 0 - Preta | 255 - Branca
 #define FUNDO 0         // Cor do fundo: 0 - Preta | 255 - Branca
 #define FALHA_FRAME 5	// Numero maximo de linhas a serem descartadas na leitura do restante de cada frame
-#define POS_CURVA_90 30	// Posição para habilitar a leitura da curva de 90 graus
-#define OFFSET_CURVA_90 30  // Numero de pixels desconsiderados a partir do centro valido anterior à curva de 90
+#define POS_CURVA_90 30	// Posiï¿½ï¿½o para habilitar a leitura da curva de 90 graus
+#define OFFSET_CURVA_90 30  // Numero de pixels desconsiderados a partir do centro valido anterior ï¿½ curva de 90
 #define OK_CURVA_90 40 // Numero de colunas que devem ser lidas para considerar uma curva de 90
 #define DELTA 30    // Numero maximo permitido entre o centro atual e o anterior
 #define VARREDURA_COMECO 100 // Expansao dos limites durante a varredura no comeco do frame
 
-//#define BIFURCACAO_ESQUERDA
-#define BIFURCACAO_DIREITA
+#define BIFURCACAO_ESQUERDA
+//#define BIFURCACAO_DIREITA
 
 class Reconhecedor
 {
@@ -28,7 +28,7 @@ public:
     bool curva_90_direita(Mat&, int *, int *);
     bool curva_90_esquerda(Mat&, int *, int *);
     
-    int centro_frame_ant; 	// Primeiro centro válido do frame anterior
+    int centro_frame_ant; 	// Primeiro centro vï¿½lido do frame anterior
 
 private:
     int n_colunas;      // Largura da imagem
